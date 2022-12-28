@@ -28,11 +28,6 @@ const configuration = new Configuration({
     apiKey: OPENAI_API_KEY,
 });
 
-const medium = new Medium({
-    clientId: MEDIUM_CLIENT_ID,
-    clientSecret: MEDIUM_CLIENT_SECRET,
-});
-
 const openai = new OpenAIApi(configuration);
 
 const parser = new Parser();
@@ -121,11 +116,24 @@ app.get('/callback', async (req, res) => {
         // Get the authorization code from the query parameters
         const code = req.query.code;
 
+        // Set up the axios instance with the necessary headers
+        const exchangeCodeForToken = axios.create({
+            baseURL: 'https://api.medium.com/v1',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `Basic ${Buffer.from(`${MEDIUM_CLIENT_ID}:${MEDIUM_CLIENT_SECRET}`).toString('base64')}`,
+            },
+        });
+
         // Exchange the authorization code for an access token
-        const tokenResponse = await medium.exchangeAuthorizationCode(code, MEDIUM_CALLBACK);
+        const tokenResponse = await exchangeCodeForToken.post('/tokens', {
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: MEDIUM_CALLBACK,
+        });
 
         // Save the access token to a session or cookie
-        req.session.accessToken = tokenResponse.access_token;
+        req.session.accessToken = tokenResponse.data.access_token;
 
         // Redirect the user to the home page
         res.redirect('/');
