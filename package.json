@@ -1,0 +1,27 @@
+{
+  "name": "backend_blog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tryghost/admin-api": "^1.13.2",
+    "@tryghost/content-api": "^1.11.5",
+    "body-parser": "^1.20.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "medium-sdk": "^0.0.4",
+    "mongodb": "^4.13.0",
+    "mongoose": "^6.8.1",
+    "nodemon": "^2.0.20",
+    "openai": "^3.1.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
+    "rss-parser": "^3.12.0"
+  }
+}
