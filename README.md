@@ -14,6 +14,6 @@ The OpenAI Medium Automatic Posts app is a tool that allows users to generate an
 - A client ID and client secret for the Medium API
 
 ## Installation
-- Clone the repository: git clone https://github.com/your-username/openai_medium_automatic_posts.git
+- Clone the repository: git clone https://github.com/pedrosgmagalhaes/openai_medium_automatic_posts/
 - Install the dependencies: npm install or yarn install
 - Create a .env file and add your API keys and other configuration variables (see the Configuration
