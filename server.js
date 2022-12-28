@@ -16,7 +16,8 @@ const {
     OPENAI_API_KEY,
     MEDIUM_CLIENT_ID,
     MEDIUM_CLIENT_SECRET,
-    MEDIUM_CALLBACK
+    MEDIUM_CALLBACK,
+    MEDIUM_USER_ID
 } = process.env;
 
 // Use body-parser as a middleware
@@ -67,13 +68,6 @@ app.post('/update-feeds', async (req, res) => {
                     temperature: 0.8
                 };
 
-                // Set the parameters for the image generation
-                const responseImage = await openai.createImage({
-                    prompt: `Digital arts without any text with: ${item.title}`,
-                    n: 1,
-                    size: "1024x1024",
-                });
-
                 // Generate a title using the OpenAI API
                 const resultTitle = await openai.createCompletion(paramsTitle);
                 const generatedTitle = resultTitle.data.choices[0].text;
@@ -82,28 +76,8 @@ app.post('/update-feeds', async (req, res) => {
                 const resultContent = await openai.createCompletion(paramsContent);
                 const generatedText = resultContent.data.choices[0].text;
 
-                let image_url = responseImage.data.data[0].url;
-
-                // Create a new post on Medium with the generated title and text
-                const post = {
-                    title: generatedTitle,
-                    contentFormat: 'html',
-                    content: generatedText,
-                    tags: ['crypto', 'blockchain', 'web3'],
-                    publishStatus: 'draft'
-                };
-
-                const user = await medium.getUser('me', tokenResponse.access_token);
-                const userId = user.data.id;
-
-                await medium.createPost({
-                    userId: userId,
-                    post: post,
-                    accessToken: tokenResponse.access_token
-                });
-
                 // Set up the axios instance with the necessary headers
-                const axiosInstance = axios.create({
+                const createPostToMedium = axios.create({
                     baseURL: 'https://api.medium.com/v1',
                     headers: {
                         'Content-Type': 'application/json',
@@ -120,8 +94,11 @@ app.post('/update-feeds', async (req, res) => {
                     publishStatus: 'draft'
                 };
 
-                // Make a POST request to the /users/{userId}/posts endpoint to create the post
-                const response = await axiosInstance.post(`/users/${userId}/posts`, postMedium);
+                try {
+                    await createPostToMedium.post(`/users/${MEDIUM_USER_ID}/posts`, postMedium);
+                } catch (error) {
+                    console.log(error)
+                }
 
                 // Pause the loop for 40 seconds after every 10 posts
                 if (counter % 10 === 0) {
