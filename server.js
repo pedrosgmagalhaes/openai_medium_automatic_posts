@@ -4,7 +4,7 @@ const Parser = require('rss-parser');
 const dotenv = require('dotenv');
 const { Configuration, OpenAIApi } = require('openai');
 const bodyParser = require('body-parser');
-const Medium = require('medium-sdk');
+const axios = require('axios');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -101,6 +101,27 @@ app.post('/update-feeds', async (req, res) => {
                     post: post,
                     accessToken: tokenResponse.access_token
                 });
+
+                // Set up the axios instance with the necessary headers
+                const axiosInstance = axios.create({
+                    baseURL: 'https://api.medium.com/v1',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${tokenResponse.access_token}`,
+                    },
+                });
+
+                // Create a new post on Medium with the generated title and text
+                const postMedium = {
+                    title: generatedTitle,
+                    contentFormat: 'html',
+                    content: generatedText,
+                    tags: ['crypto', 'blockchain', 'web3'],
+                    publishStatus: 'draft'
+                };
+
+                // Make a POST request to the /users/{userId}/posts endpoint to create the post
+                const response = await axiosInstance.post(`/users/${userId}/posts`, postMedium);
 
                 // Pause the loop for 40 seconds after every 10 posts
                 if (counter % 10 === 0) {
