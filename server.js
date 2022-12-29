@@ -123,39 +123,54 @@ app.get('/login', (req, res) => {
         res.send(error);
     }
 });
-
-
 app.get('/callback', async (req, res) => {
     try {
-        // Get the authorization code from the query parameters
+        // Get the authorization code, state, and error from the query parameters
         const code = req.query.code;
+        const state = req.query.state;
+        const error = req.query.error;
 
-        // Set up the axios instance with the necessary headers
-        const exchangeCodeForToken = axios.create({
-            baseURL: 'https://api.medium.com/v1',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Basic ${Buffer.from(`${MEDIUM_CLIENT_ID}:${MEDIUM_CLIENT_SECRET}`).toString('base64')}`,
-            },
-        });
+        // Check if the request contains an error
+        if (error) {
+            // Handle the error
+            console.error(error);
+            res.send(error);
+        } else {
+            // Check if the state matches the one stored in the session
+            if (state !== req.session.state) {
+                // Handle the error
+                console.error('Invalid state');
+                res.send('Invalid state');
+            } else {
+                // Set up the axios instance with the necessary headers
+                const exchangeCodeForToken = axios.create({
+                    baseURL: 'https://api.medium.com/v1',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': `Basic ${Buffer.from(`${MEDIUM_CLIENT_ID}:${MEDIUM_CLIENT_SECRET}`).toString('base64')}`,
+                    },
+                });
 
-        // Exchange the authorization code for an access token
-        const tokenResponse = await exchangeCodeForToken.post('/tokens', {
-            grant_type: 'authorization_code',
-            code: code,
-            redirect_uri: MEDIUM_CALLBACK,
-        });
+                // Exchange the authorization code for an access token
+                const tokenResponse = await exchangeCodeForToken.post('/tokens', {
+                    grant_type: 'authorization_code',
+                    code: code,
+                    redirect_uri: MEDIUM_CALLBACK,
+                });
 
-        // Save the access token to a session or cookie
-        req.session.accessToken = tokenResponse.data.access_token;
+                // Save the access token to a session or cookie
+                req.session.accessToken = tokenResponse.data.access_token;
 
-        // Send a message containing the session access token to the client
-        res.send(`Session access token is: ${req.session.accessToken}`);
+                // Send a message containing the session access token to the client
+                res.send(`Session access token is: ${req.session.accessToken}`);
+            }
+        }
     } catch (error) {
         console.error(error);
         res.send(error);
     }
 });
+
 
 app.listen(3000, () => {
     console.log('Express app listening on port 3000');
