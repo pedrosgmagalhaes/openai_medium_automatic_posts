@@ -143,11 +143,19 @@ app.get('/login', (req, res) => {
     }
 });
 
-app.get('/access-token', (req, res) => {
-    const accessToken = req.session.accessToken;
-    res.send(accessToken);
-});
-
+app.get('/get-access-token', (req, res) => {
+    try {
+      // Get the access token from the session
+      const accessToken = req.session.accessToken;
+  
+      // Send the access token to the client
+      res.send(`Access token is: ${accessToken}`);
+    } catch (error) {
+      console.error(error);
+      res.send(error);
+    }
+  });
+  
 app.get('/callback', async (req, res) => {
     try {
         // Get the authorization code, state, and error from the query parameters
