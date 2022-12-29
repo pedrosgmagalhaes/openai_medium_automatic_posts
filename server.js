@@ -5,11 +5,18 @@ const dotenv = require('dotenv');
 const { Configuration, OpenAIApi } = require('openai');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const cors = require('cors');
 
 // Load environment variables from .env file
 dotenv.config();
 
 const app = express();
+
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 const {
     BLOGS,
