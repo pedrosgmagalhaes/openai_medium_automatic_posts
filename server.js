@@ -184,7 +184,6 @@ app.get('/callback', async (req, res) => {
     }
 });
 
-
-app.listen(3000, () => {
-    console.log('Express app listening on port 3000');
+app.listen(8080, () => {
+    console.log('Express app listening on port 8080');
 });
