@@ -18,6 +18,13 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+app.use(expressSession({
+    secret: 'OMAPS-FGT764',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true }
+}));
+
 const {
     BLOGS,
     OPENAI_API_KEY,
@@ -139,7 +146,7 @@ app.get('/login', (req, res) => {
 app.get('/access-token', (req, res) => {
     const accessToken = req.session.accessToken;
     res.send(accessToken);
-  });
+});
 
 app.get('/callback', async (req, res) => {
     try {
