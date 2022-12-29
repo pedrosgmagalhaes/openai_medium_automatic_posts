@@ -135,23 +135,14 @@ app.get('/callback', async (req, res) => {
         // Save the access token to a session or cookie
         req.session.accessToken = tokenResponse.data.access_token;
 
-        // Check if the response status code is 200
-        if (tokenResponse.status === 200) {
-            // Save the access token to a session or cookie
-            req.session.accessToken = tokenResponse.data.access_token;
-
-            // Redirect the user to the home page
-            res.redirect('/');
-        } else {
-            // Handle other status codes as needed
-            res.send(`Error: ${tokenResponse.status}`);
-        }
-
+        // Send a message containing the session access token to the client
+        res.send(`Session access token is: ${req.session.accessToken}`);
     } catch (error) {
         console.error(error);
         res.send(error);
     }
 });
+
 
 
 app.listen(3000, () => {
