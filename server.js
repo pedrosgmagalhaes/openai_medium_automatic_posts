@@ -112,12 +112,18 @@ app.post('/update-feeds', async (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    // Generate a random state value and store it in the session
-    req.session.state = Math.random().toString(36).substring(2, 15);
+    try {
+        // Generate a random state value and store it in the session
+        req.session.state = Math.random().toString(36).substring(2, 15);
 
-    // Redirect the user to the Medium OAuth authorization page
-    res.redirect(`https://medium.com/m/oauth/authorize?client_id=${MEDIUM_CLIENT_ID}&scope=basicProfile,publishPost&state=${req.session.state}&response_type=code&redirect_uri=${MEDIUM_CALLBACK}`);
+        // Redirect the user to the Medium OAuth authorization page
+        res.redirect(`https://medium.com/m/oauth/authorize?client_id=${MEDIUM_CLIENT_ID}&scope=basicProfile,publishPost&state=${req.session.state}&response_type=code&redirect_uri=${MEDIUM_CALLBACK}`);
+    } catch (error) {
+        console.error(error);
+        res.send(error);
+    }
 });
+
 
 app.get('/callback', async (req, res) => {
     try {
