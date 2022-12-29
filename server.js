@@ -136,6 +136,11 @@ app.get('/login', (req, res) => {
     }
 });
 
+app.get('/access-token', (req, res) => {
+    const accessToken = req.session.accessToken;
+    res.send(accessToken);
+  });
+
 app.get('/callback', async (req, res) => {
     try {
         // Get the authorization code, state, and error from the query parameters
