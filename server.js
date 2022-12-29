@@ -6,6 +6,7 @@ const { Configuration, OpenAIApi } = require('openai');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const cors = require('cors');
+const session = require('express-session');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -18,7 +19,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(expressSession({
+app.use(session({
     secret: 'OMAPS-FGT764',
     resave: false,
     saveUninitialized: true,
