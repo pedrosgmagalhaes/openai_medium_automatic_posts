@@ -34,6 +34,11 @@ const parser = new Parser();
 
 const blogs = BLOGS.split(',');
 
+app.get('/test', (req, res) => {
+    res.status(200).send('OK');
+});
+
+
 app.post('/update-feeds', async (req, res) => {
     try {
         // Exchange the authorization code for an access token
@@ -123,6 +128,7 @@ app.get('/login', (req, res) => {
         res.send(error);
     }
 });
+
 app.get('/callback', async (req, res) => {
     try {
         // Get the authorization code, state, and error from the query parameters
