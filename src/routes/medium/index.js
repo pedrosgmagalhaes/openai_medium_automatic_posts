@@ -68,6 +68,8 @@ mediumRouter.get('/callback', async (req, res) => {
                     grant_type: 'authorization_code',
                     code: code,
                     redirect_uri: MEDIUM_CALLBACK,
+                    client_id: MEDIUM_CLIENT_ID,
+                    client_secret: MEDIUM_CLIENT_SECRET
                 });
 
                 // Update the access_token field in the mediumAuth object
