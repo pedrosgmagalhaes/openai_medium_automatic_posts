@@ -14,15 +14,13 @@ const {
     MEDIUM_CALLBACK,
 } = process.env;
 
-mediumRouter.post('/login', async (req, res) => {
+mediumRouter.get('/login', async (req, res) => {
 
     // Generate a random state value
     const stateValue = Math.random().toString(36).substring(2, 15);
 
     // Create a new state in the database
     const medium = new Medium({ state: stateValue });
-
-    console.log(medium);
 
     try {
         await medium.save().then(
@@ -52,7 +50,7 @@ mediumRouter.get('/callback', async (req, res) => {
             const mediumAuth = await Medium.findOne({ state: state });
 
             // Check if the state matches the one stored in MongoDB
-            if (!mediumAuth) {
+            if (!mediumAuth || mediumAuth.state !== state) {
                 // Handle the error
                 res.send('Invalid state');
             } else {
