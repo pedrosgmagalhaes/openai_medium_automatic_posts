@@ -77,6 +77,9 @@ mediumRouter.get('/callback', async (req, res) => {
 
                 // Save the updated mediumAuth object to the database
                 await mediumAuth.save({ access_token: tokenResponse.data.access_token });
+
+                // Send a success message
+                res.send('Logged with success');
             }
         }
     } catch (error) {
