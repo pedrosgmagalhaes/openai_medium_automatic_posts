@@ -4,23 +4,28 @@ const cors = require('cors');
 const session = require('express-session');
 const feedsRouter = require('./src/routes/feeds/');
 const mediumRouter = require('./src/routes/medium/');
-const mongodb = require('mongodb');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
 const app = express();
 
+// Load environment variables from .env file
+dotenv.config();
+
 // Connection URL
-const url = process.env.MONGO_URI;
+const { MONGO_URI } = process.env;
+
+console.log(MONGO_URI);
 
 // Create a new MongoClient
-const client = new mongodb.MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => {
+        console.log('Connected to MongoDB');
+    })
+    .catch((error) => {
+        console.error(error);
+    });
 
-try {
-    // Use connect method to connect to the Server
-    client.connect();
-    console.log('Connected to MongoDB');
-} catch (error) {
-    console.error(error);
-}
 
 app.use(cors({
     origin: '*',

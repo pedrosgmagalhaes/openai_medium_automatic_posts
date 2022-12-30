@@ -2,16 +2,13 @@ const mongoose = require('mongoose');
 
 const mediumAuthSchema = new mongoose.Schema({
   code: {
-    type: String,
-    required: true
+    type: String
   },
   state: {
-    type: String,
-    required: true
+    type: String
   },
   access_token: {
-    type: String,
-    required: true
+    type: String
   }
 });
 

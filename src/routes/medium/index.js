@@ -1,6 +1,7 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
 const express = require('express');
+const Medium = require('../../models/mediumAuth/');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -13,37 +14,26 @@ const {
     MEDIUM_CALLBACK,
 } = process.env;
 
-
 mediumRouter.post('/login', async (req, res) => {
+
+    // Generate a random state value
+    const stateValue = Math.random().toString(36).substring(2, 15);
+
+    // Create a new state in the database
+    const medium = new Medium({ state: stateValue });
+
+    console.log(medium);
+
     try {
+        await medium.save().then(
+            () => res.redirect(`https://medium.com/m/oauth/authorize?client_id=${MEDIUM_CLIENT_ID}&scope=basicProfile,publishPost&state=${stateValue}&response_type=code&redirect_uri=${MEDIUM_CALLBACK}`)
+        );
 
-        // Generate a random state value
-        const stateValue = Math.random().toString(36).substring(2, 15);
-
-        // Create a new state in the database
-        const state = new State({ value: stateValue });
-        await state.save();
-
-        // Redirect the user to the Medium OAuth authorization page
-        res.redirect(`https://medium.com/m/oauth/authorize?client_id=${MEDIUM_CLIENT_ID}&scope=basicProfile,publishPost&state=${req.session.state}&response_type=code&redirect_uri=${MEDIUM_CALLBACK}`);
     } catch (error) {
-        console.error(error);
-        res.send(error);
+        res.send(error)
     }
 });
 
-mediumRouter.get('/get-access-token', (req, res) => {
-    try {
-        // Get the access token from the session
-        const accessToken = req.session.accessToken;
-
-        // Send the access token to the client
-        res.send(`Access token is: ${accessToken}`);
-    } catch (error) {
-        console.error(error);
-        res.send(error);
-    }
-});
 
 mediumRouter.get('/callback', async (req, res) => {
     try {
@@ -58,10 +48,12 @@ mediumRouter.get('/callback', async (req, res) => {
             console.error(error);
             res.send(error);
         } else {
-            // Check if the state matches the one stored in the session
-            if (state !== req.session.state) {
+            // Retrieve the state stored in MongoDB
+            const mediumAuth = await Medium.findOne({ state: state });
+
+            // Check if the state matches the one stored in MongoDB
+            if (!mediumAuth) {
                 // Handle the error
-                console.error('Invalid state');
                 res.send('Invalid state');
             } else {
                 // Set up the axios instance with the necessary headers
@@ -80,8 +72,11 @@ mediumRouter.get('/callback', async (req, res) => {
                     redirect_uri: MEDIUM_CALLBACK,
                 });
 
-                // Save the access token to a session or cookie
-                req.session.accessToken = tokenResponse.data.access_token;
+                // Update the access_token field in the mediumAuth object
+                mediumAuth.access_token = tokenResponse.data.access_token;
+
+                // Save the updated mediumAuth object to the database
+                await mediumAuth.save({ access_token: tokenResponse.data.access_token });
             }
         }
     } catch (error) {
@@ -89,5 +84,7 @@ mediumRouter.get('/callback', async (req, res) => {
         res.send(error);
     }
 });
+
+
 
 module.exports = mediumRouter;
