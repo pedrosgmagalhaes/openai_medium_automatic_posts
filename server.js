@@ -18,7 +18,7 @@ const { MONGO_URI } = process.env;
 
 
 // Create a new MongoClient
-mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true, ssl: false })
     .then(() => {
         console.log('Connected to MongoDB');
     })
