@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
 const feedsRouter = require('./src/routes/feeds/');
+const authRouter = require('./src/routes/auth/');
 const mediumRouter = require('./src/routes/medium/');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -15,7 +16,6 @@ dotenv.config();
 // Connection URL
 const { MONGO_URI } = process.env;
 
-console.log(MONGO_URI);
 
 // Create a new MongoClient
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -43,6 +43,7 @@ app.use(session({
 // Use body-parser as a middleware
 app.use(bodyParser.json());
 
+app.use('/api/auth', authRouter);
 app.use('/api/feeds', feedsRouter);
 app.use('/api/medium', mediumRouter);
 
